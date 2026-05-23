@@ -18,8 +18,10 @@ services:
         sync: false
       - key: TELEGRAM_CHAT_ID
         sync: false
-      - key: GOOGLE_SHEET_ID
+      - key: NO_CALL_SHEET_ID
         value: 1_87oFyHCPIoLyqZo5TCtuSZkLbHNCETWjJZs9UW56MI
+      - key: NO_MEETING_SHEET_ID
+        value: 1nnnICEEXojtqwcOzQVDKAhY-NUZzAy-wdh4g8wnr6Y8
       - key: GOOGLE_SERVICE_ACCOUNT_JSON
         sync: false
       - key: RUN_SECRET

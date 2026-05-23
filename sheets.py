@@ -5,8 +5,8 @@ from google.oauth2.service_account import Credentials
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-NO_CALL_SHEET_ID    = "1_87oFyHCPIoLyqZo5TCtuSZkLbHNCETWjJZs9UW56MI"
-NO_MEETING_SHEET_ID = "1nnnICEEXojtqwcOzQVDKAhY-NUZzAy-wdh4g8wnr6Y8"
+NO_CALL_SHEET_ID    = os.environ["NO_CALL_SHEET_ID"]
+NO_MEETING_SHEET_ID = os.environ["NO_MEETING_SHEET_ID"]
 
 _SERVICE_ACCOUNT_JSON = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 
