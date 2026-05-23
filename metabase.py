@@ -63,8 +63,10 @@ def fetch_leads() -> pd.DataFrame:
 
     df.columns = [c.strip() for c in df.columns]
 
+    # pandas 3.0: use copy() before datetime assignment to avoid dtype conflict
+    df = df.copy()
     for col in DATETIME_COLS:
         if col in df.columns:
-            df.loc[:, col] = pd.to_datetime(df[col], errors="coerce")
+            df[col] = pd.to_datetime(df[col], errors="coerce")
 
     return df
