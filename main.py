@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, BackgroundTasks
 import os
 import logging
 from metabase import fetch_leads
@@ -30,15 +30,18 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/run")
-def run(x_run_secret: str | None = Header(default=None)):
-    if RUN_SECRET and x_run_secret != RUN_SECRET:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+def _run_job():
     try:
         df = fetch_leads()
         result = run_checks(df)
         logger.info(f"Run complete: {result}")
-        return {"status": "done", **result}
     except Exception as e:
         logger.error(f"Run failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/run", status_code=202)
+def run(background_tasks: BackgroundTasks, x_run_secret: str | None = Header(default=None)):
+    if RUN_SECRET and x_run_secret != RUN_SECRET:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    background_tasks.add_task(_run_job)
+    return {"status": "accepted"}
