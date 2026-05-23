@@ -1,0 +1,23 @@
+services:
+  - type: worker
+    name: metabase-lead-alerts
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    envVars:
+      - key: METABASE_URL
+        value: https://analytics.leapfinance.com
+      - key: METABASE_QUESTION_ID
+        value: "33548"
+      - key: METABASE_EMAIL
+        sync: false
+      - key: METABASE_PASSWORD
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: GOOGLE_SHEET_ID
+        value: 1_87oFyHCPIoLyqZo5TCtuSZkLbHNCETWjJZs9UW56MI
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
