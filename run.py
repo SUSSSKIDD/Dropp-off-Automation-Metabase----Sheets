@@ -35,8 +35,8 @@ if __name__ == "__main__":
     except Exception as e:
         logger.warning(f"Startup seed failed (will continue): {e}")
 
-    schedule.every(5).minutes.do(job)
-    logger.info("Scheduler running — checking every 5 minutes.")
+    schedule.every(20).minutes.do(job)
+    logger.info("Scheduler running — checking every 20 minutes.")
 
     # Run once immediately so today's backlog is processed on startup
     job()
