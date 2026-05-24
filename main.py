@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Header, BackgroundTasks
+from fastapi.responses import PlainTextResponse
 import os
 import logging
 from metabase import fetch_leads
@@ -39,9 +40,9 @@ def _run_job():
         logger.error(f"Run failed: {e}", exc_info=True)
 
 
-@app.post("/run", status_code=202)
+@app.post("/run")
 def run(background_tasks: BackgroundTasks, x_run_secret: str | None = Header(default=None)):
     if RUN_SECRET and x_run_secret != RUN_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
     background_tasks.add_task(_run_job)
-    return {"status": "accepted"}
+    return PlainTextResponse("OK")
