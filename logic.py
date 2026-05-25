@@ -73,7 +73,8 @@ def run_checks(df: pd.DataFrame) -> dict:
 
         # Alert 2: Call Completion strictly True + no meeting booked within 15 min
         call_completed = row.get("Call Completion")
-        call_is_true = call_completed is True or str(call_completed).strip().lower() == "true"
+        # MetaBase returns numpy.bool_ — use == not `is` for reliable comparison
+        call_is_true = bool(call_completed) if call_completed not in (None, "", "nan") and not _is_empty(call_completed) else False
 
         if (
             call_is_true

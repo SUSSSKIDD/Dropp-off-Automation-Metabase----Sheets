@@ -32,41 +32,42 @@ def _get_session_token() -> str:
     return _session_token
 
 
-def fetch_leads() -> pd.DataFrame:
+def _fetch(start_date: str, end_date: str) -> pd.DataFrame:
     global _session_token
-    ist = pytz.timezone("Asia/Kolkata")
-    today = datetime.now(ist).strftime("%Y-%m-%d")
-
     token = _get_session_token()
     url = f"{METABASE_URL}/api/card/{METABASE_QUESTION_ID}/query/json"
     headers = {"X-Metabase-Session": token, "Content-Type": "application/json"}
     payload = {
         "parameters": [
-            {"type": "date/single", "target": ["variable", ["template-tag", "lead_start_date"]], "value": today},
-            {"type": "date/single", "target": ["variable", ["template-tag", "lead_end_date"]], "value": today},
+            {"type": "date/single", "target": ["variable", ["template-tag", "lead_start_date"]], "value": start_date},
+            {"type": "date/single", "target": ["variable", ["template-tag", "lead_end_date"]], "value": end_date},
         ]
     }
-
     resp = requests.post(url, json=payload, headers=headers, timeout=60)
-
-    # Re-auth once if session expired
     if resp.status_code == 401:
         _session_token = None
         headers["X-Metabase-Session"] = _get_session_token()
         resp = requests.post(url, json=payload, headers=headers, timeout=60)
-
     resp.raise_for_status()
 
     df = pd.DataFrame(resp.json())
     if df.empty:
         return df
-
     df.columns = [c.strip() for c in df.columns]
-
-    # pandas 3.0: use copy() before datetime assignment to avoid dtype conflict
     df = df.copy()
     for col in DATETIME_COLS:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
-
     return df
+
+
+def fetch_leads() -> pd.DataFrame:
+    global _session_token
+    ist = pytz.timezone("Asia/Kolkata")
+    today = datetime.now(ist).strftime("%Y-%m-%d")
+
+    return _fetch(today, today)
+
+
+def fetch_leads_range(start_date: str, end_date: str) -> pd.DataFrame:
+    return _fetch(start_date, end_date)
