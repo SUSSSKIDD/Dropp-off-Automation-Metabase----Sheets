@@ -11,8 +11,9 @@ METABASE_QUESTION_ID = int(os.environ.get("METABASE_QUESTION_ID", "33548"))
 
 DATETIME_COLS = [
     "Form Filled At IST",
-    "Latest Completed AI Call Started At IST",
+    "Latest AI Call Started At IST",
     "Meeting Booked At IST",
+    "Counselling Slot Time IST",
 ]
 
 _session_token: str | None = None
@@ -43,29 +44,29 @@ def _fetch(start_date: str, end_date: str) -> pd.DataFrame:
             {"type": "date/single", "target": ["variable", ["template-tag", "lead_end_date"]], "value": end_date},
         ]
     }
-    resp = requests.post(url, json=payload, headers=headers, timeout=60)
+    resp = requests.post(url, json=payload, headers=headers, timeout=180)
     if resp.status_code == 401:
         _session_token = None
         headers["X-Metabase-Session"] = _get_session_token()
-        resp = requests.post(url, json=payload, headers=headers, timeout=60)
+        resp = requests.post(url, json=payload, headers=headers, timeout=180)
     resp.raise_for_status()
 
     df = pd.DataFrame(resp.json())
     if df.empty:
         return df
+
     df.columns = [c.strip() for c in df.columns]
     df = df.copy()
     for col in DATETIME_COLS:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
+
     return df
 
 
 def fetch_leads() -> pd.DataFrame:
-    global _session_token
     ist = pytz.timezone("Asia/Kolkata")
     today = datetime.now(ist).strftime("%Y-%m-%d")
-
     return _fetch(today, today)
 
 

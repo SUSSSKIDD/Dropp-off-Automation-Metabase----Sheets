@@ -49,7 +49,7 @@ def alert_no_meeting(entry: dict) -> None:
         f"🎓 <b>Education:</b>         {_fmt(entry.get('Highest Level Education'))}\n"
         f"✈️  <b>Preferred Intake:</b>  {_fmt(entry.get('Preferred Intake'))}\n"
         f"📅 <b>Form Filled At:</b>    {_fmt(entry.get('Form Filled At IST'))}\n"
-        f"📞 <b>Call Completed At:</b> {_fmt(entry.get('Latest Completed AI Call Started At IST'))}\n\n"
+        f"📞 <b>Call Completed At:</b> {_fmt(entry.get('Latest AI Call Started At IST'))}\n\n"
         "⚠️ No meeting booked within 15 min of call completion."
     )
     _send(msg)

@@ -18,7 +18,7 @@ NO_CALL_HEADERS = [
 NO_MEETING_HEADERS = [
     "Pre User ID", "Name", "Phone",
     "Preferred Intake", "Highest Level Education",
-    "Form Filled At IST", "Call Completed At IST",
+    "Form Filled At IST", "Latest AI Call Started At IST",
 ]
 
 _client: gspread.Client | None = None
@@ -79,7 +79,7 @@ def append_no_meeting(entry: dict) -> None:
         _v(entry, "Pre User ID"), _v(entry, "Name"), _v(entry, "Phone"),
         _v(entry, "Preferred Intake"), _v(entry, "Highest Level Education"),
         _v(entry, "Form Filled At IST"),
-        _v(entry, "Latest Completed AI Call Started At IST"),
+        _v(entry, "Latest AI Call Started At IST"),
     ]
     _get_no_meeting_ws().append_row(row, value_input_option="USER_ENTERED")
 
