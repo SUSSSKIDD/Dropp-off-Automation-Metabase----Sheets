@@ -71,10 +71,13 @@ def run_checks(df: pd.DataFrame) -> dict:
             _seen_no_call.add(uid)
             no_call_count += 1
 
-        # Alert 2: call completed but no meeting booked within 15 min
+        # Alert 2: Call Completion strictly True + no meeting booked within 15 min
+        call_completed = row.get("Call Completion")
+        call_is_true = call_completed is True or str(call_completed).strip().lower() == "true"
+
         if (
-            call_time is not None
-            and not call_empty
+            call_is_true
+            and call_time is not None
             and meeting_empty
             and (now - call_time).total_seconds() >= WINDOW_MIN * 60
             and uid not in _seen_no_meeting
