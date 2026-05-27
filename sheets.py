@@ -13,7 +13,10 @@ _SERVICE_ACCOUNT_JSON = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 NO_CALL_HEADERS = [
     "Pre User ID", "Name", "Phone",
     "Preferred Intake", "Highest Level Education", "Form Filled At IST",
+    "Airo Link",
 ]
+
+AIRO_LINK_COL = 7  # column G (1-based)
 
 NO_MEETING_HEADERS = [
     "Pre User ID", "Name", "Phone",
@@ -48,6 +51,9 @@ def _get_no_call_ws() -> gspread.Worksheet:
     global _ws_no_call
     if _ws_no_call is None:
         _ws_no_call = _get_ws(NO_CALL_SHEET_ID, NO_CALL_HEADERS, "_ws_no_call")
+        # Ensure Airo Link header exists on existing sheets without clearing data
+        if _ws_no_call.cell(1, AIRO_LINK_COL).value != "Airo Link":
+            _ws_no_call.update_cell(1, AIRO_LINK_COL, "Airo Link")
     return _ws_no_call
 
 
@@ -92,3 +98,21 @@ def get_no_call_ids() -> set[str]:
 def get_no_meeting_ids() -> set[str]:
     rows = _get_no_meeting_ws().get_all_values()
     return {str(r[0]).strip() for r in rows[1:] if r and r[0]}
+
+
+def get_rows_missing_airo_link() -> list[tuple[int, str]]:
+    """Returns (1-based row number, pre_user_id) for no-call rows where Airo Link is blank."""
+    rows = _get_no_call_ws().get_all_values()
+    result = []
+    for i, row in enumerate(rows[1:], start=2):
+        pre_user_id = row[0].strip() if row else ""
+        if not pre_user_id:
+            continue
+        airo_link = row[AIRO_LINK_COL - 1] if len(row) >= AIRO_LINK_COL else ""
+        if not airo_link.strip() or airo_link.strip() == "API ERROR":
+            result.append((i, pre_user_id))
+    return result
+
+
+def update_airo_link(row_num: int, value: str) -> None:
+    _get_no_call_ws().update_cell(row_num, AIRO_LINK_COL, value)

@@ -26,3 +26,5 @@ services:
         sync: false
       - key: RUN_SECRET
         sync: false
+      - key: MIXPANEL_API_SECRET
+        sync: false
